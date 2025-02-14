@@ -88,7 +88,7 @@ module.exports.getTaskById = async (req, res) => {
     if (!task) {
       return res.status(404).json({ message: "Task not found" });
     }
-
+    console.log(task);
     res.status(200).json({ task });
   } catch (error) {
     console.error(error);
@@ -101,7 +101,7 @@ module.exports.updateTask = async (req, res) => {
   try {
     const { id } = req.params;
     const { name, description, status } = req.body;
-
+    console.log(id, "id", name, "name", description, "des", status, "status");
     const updatedTask = await Task.findByIdAndUpdate(
       id,
       { name, description, status },

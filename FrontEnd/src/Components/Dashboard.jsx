@@ -4,7 +4,7 @@ import UpdateTask from "./UpdateTask";
 import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
-  const { user, isAuthenticated, logout } = useAuth0();
+  const { user, isAuthenticated, logout, getAccessTokenSilently } = useAuth0();
   const [tasks, setTasks] = useState([]);
   const [name, setName] = useState("");
   const [newDescription, setNewDescription] = useState("");
@@ -12,21 +12,57 @@ const Dashboard = () => {
   const [selectedTask, setSelectedTask] = useState(null);
   const navigate = useNavigate();
   // Fetch user tasks from backend
+  // useEffect(() => {
+  //   if (isAuthenticated) {
+  //     fetch(`http://localhost:3000/todo/tasks?userId=${user.sub}`)
+  //       .then((res) => res.json())
+  //       .then((data) => setTasks(data.tasks || []))
+  //       .catch((error) => console.error("Error fetching tasks:", error));
+  //   }
+  // }, [isAuthenticated, user?.sub]);
+
   useEffect(() => {
-    if (isAuthenticated) {
-      fetch(`http://localhost:3000/todo/tasks?userId=${user.sub}`)
-        .then((res) => res.json())
-        .then((data) => setTasks(data.tasks || []))
-        .catch((error) => console.error("Error fetching tasks:", error));
-    }
+    const fetchTasks = async () => {
+      if (isAuthenticated && user?.sub) {
+        const token = await getAccessTokenSilently(); // Replace with the actual token retrieval logic
+
+        try {
+          const res = await fetch(
+            `http://localhost:3000/todo/tasks?userId=${user.sub}`,
+            {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${token}`, // Add the Authorization header with the token
+                "Content-Type": "application/json", // Ensure content type is correct (optional)
+              },
+            }
+          );
+
+          if (res.ok) {
+            const data = await res.json();
+            setTasks(data.tasks || []);
+          } else {
+            console.error("Error fetching tasks: ", res.statusText);
+          }
+        } catch (error) {
+          console.error("Error fetching tasks: ", error);
+        }
+      }
+    };
+
+    fetchTasks();
   }, [isAuthenticated, user?.sub]);
 
   // Add new task
   const addTask = async () => {
     if (!name.trim() || !newDescription.trim()) return;
+    const token = await getAccessTokenSilently();
     const response = await fetch("http://localhost:3000/todo/task", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify({
         userId: user.sub,
         name: name,
@@ -43,8 +79,12 @@ const Dashboard = () => {
 
   // Delete a task
   const deleteTask = async (taskId) => {
+    const token = await getAccessTokenSilently();
     await fetch(`http://localhost:3000/todo/task/${taskId}`, {
       method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     });
     setTasks(tasks.filter((task) => task._id !== taskId));
   };
