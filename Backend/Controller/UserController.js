@@ -246,7 +246,12 @@ module.exports.loginUser = async (req, res) => {
 
     // If user is from Google (auth0Id exists), don't check password
     if (user.auth0Id) {
-      return res.status(400).json({ message: "Please log in using Google" });
+      return res
+        .status(400)
+        .json({
+          message:
+            "This mail is Linked with Gooogle so,Please log in using Google",
+        });
     }
 
     // If the user has a password, compare it

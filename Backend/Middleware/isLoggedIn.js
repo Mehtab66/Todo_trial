@@ -1,8 +1,7 @@
-import { auth } from "express-oauth2-jwt-bearer"; // ✅ CommonJS import
+// In isLoggedIn.js (ESM style)
+import { auth } from "express-oauth2-jwt-bearer"; // Importing correctly in ESM
 
-const checkJwt = auth({
+export const checkJwt = auth({
   audience: process.env.AUDIENCE,
   issuerBaseURL: process.env.ISSUER_BASE_URL,
 });
-
-export default { checkJwt };
