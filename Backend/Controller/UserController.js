@@ -1,7 +1,5 @@
 const User = require("../Models/User");
 const Task = require("../Models/Task");
-const generateToken = require("../Middleware/GenerateToken");
-const bcrypt = require("bcrypt");
 module.exports.checkUser = async (req, res) => {
   const { auth0Id, email, name } = req.body;
 
@@ -25,49 +23,21 @@ module.exports.checkUser = async (req, res) => {
 };
 
 //get all tasks
-// module.exports.getTasks = async (req, res) => {
-//   try {
-//     const { userId } = req.query;
-
-//     // Fetch tasks where isDeleted is false, and sort them by createdAt in descending order (newest first)
-//     const tasks = await Task.find({ userId, isDeleted: { $ne: true } }).sort({
-//       createdAt: -1,
-//     });
-
-//     res.json({ tasks });
-//   } catch (error) {
-//     res.status(500).json({ error: "Failed to fetch tasks" });
-//   }
-// };
 module.exports.getTasks = async (req, res) => {
   try {
-    const { userId, email } = req.query;
+    const { userId } = req.query;
 
-    if (!userId && !email) {
-      return res.status(400).json({ message: "User ID or email is required" });
-    }
-
-    // Fetch user by either auth0Id (for Auth0 users) or email (for manual users)
-    const user = await User.findOne({
-      $or: [{ auth0Id: userId }, { email: email }],
+    // Fetch tasks where isDeleted is false, and sort them by createdAt in descending order (newest first)
+    const tasks = await Task.find({ userId, isDeleted: { $ne: true } }).sort({
+      createdAt: -1,
     });
 
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    // Fetch tasks for this user
-    const tasks = await Task.find({ userId: user.auth0Id || user.email });
-
-    res.json({
-      tasks,
-      user: { name: user.name, email: user.email },
-    });
+    res.json({ tasks });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server error", error });
+    res.status(500).json({ error: "Failed to fetch tasks" });
   }
 };
+
 //addTask
 module.exports.addTask = async (req, res) => {
   try {
@@ -148,6 +118,7 @@ module.exports.updateTask = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+<<<<<<< HEAD
 // exports.registerUser = async (req, res) => {
 //   try {
 //     const { name, email, password, auth0Id } = req.body;
@@ -274,3 +245,5 @@ module.exports.loginUser = async (req, res) => {
     res.status(500).json({ message: "Server error", error });
   }
 };
+=======
+>>>>>>> parent of e73d4f9 (Controller set Up for Logging using Email and Password)

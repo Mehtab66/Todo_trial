@@ -16,6 +16,6 @@ router.get("/task/:id", checkJwt, Controller.getTaskById);
 // Update task
 router.patch("/task/:id", checkJwt, Controller.updateTask);
 
-router.post("/register", Controller.registerUser);
-router.post("/login", Controller.loginUser);
+module.exports = router;
+
 module.exports = router;
