@@ -1,12 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useNavigate } from "react-router-dom";
 
 const Auth = () => {
   const [isSignUp, setIsSignUp] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
+  const [userData, setUserData] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
   const {
     loginWithRedirect,
     logout,
@@ -59,23 +61,37 @@ const Auth = () => {
           }),
         });
 
-        if (!response.ok) {
-          throw new Error("Failed to check user in DB");
+          if (response.ok) {
+            navigate("/dashboard");
+          }
+        } catch (error) {
+          console.error("Error checking user in DB:", error);
         }
-
-        const data = await response.json();
-        console.log("API Response:", data);
-        if (data.user) {
-          console.log("User found or created:", data.user);
-        } else {
-          console.log("User response missing:", data);
-        }
-
-        // Redirect to dashboard
-        navigate("/dashboard");
-      } catch (error) {
-        console.error("Error checking user in DB:", error);
       }
+    };
+    checkUserInDB();
+  }, [isAuthenticated, user, getAccessTokenSilently, navigate]);
+
+  // Handle Manual Signup/Login
+  const handleAuth = async (e) => {
+    e.preventDefault();
+    const endpoint = isSignUp ? "register" : "login";
+    try {
+      const response = await fetch(`http://localhost:3000/todo/${endpoint}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(userData),
+      });
+      const result = await response.json();
+      if (response.ok) {
+        navigate("/dashboard");
+      } else if (response.status === 400) {
+        alert(result.message);
+      } else if (response.status === 402) {
+        alert(result.message);
+      }
+    } catch (error) {
+      console.error("Error:", error);
     }
   };
 
@@ -86,56 +102,45 @@ const Auth = () => {
           {isSignUp ? "Sign Up" : "Log In"}
         </h2>
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleAuth} className="flex flex-col gap-4">
           {isSignUp && (
-            <div className="mb-4">
-              <label htmlFor="name" className="block text-gray-600 mb-2">
-                Name
-              </label>
-              <input
-                type="text"
-                id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-md"
-                required
-              />
-            </div>
+            <input
+              type="text"
+              placeholder="Full Name"
+              className="p-3 border rounded-md"
+              value={userData.name}
+              onChange={(e) =>
+                setUserData({ ...userData, name: e.target.value })
+              }
+              required
+            />
           )}
-
-          <div className="mb-4">
-            <label htmlFor="email" className="block text-gray-600 mb-2">
-              Email
-            </label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-md"
-              required
-            />
-          </div>
-
-          <div className="mb-4">
-            <label htmlFor="password" className="block text-gray-600 mb-2">
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-md"
-              required
-            />
-          </div>
+          <input
+            type="email"
+            placeholder="Email"
+            className="p-3 border rounded-md"
+            value={userData.email}
+            onChange={(e) =>
+              setUserData({ ...userData, email: e.target.value })
+            }
+            required
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            className="p-3 border rounded-md"
+            value={userData.password}
+            onChange={(e) =>
+              setUserData({ ...userData, password: e.target.value })
+            }
+            required
+          />
 
           <button
             type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-md transition duration-200 ease-in-out transform hover:scale-105 mb-3"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-md transition duration-200"
           >
-            {isSignUp ? "Create Account" : "Login"}
+            {isSignUp ? "Sign Up" : "Log In"}
           </button>
         </form>
 
@@ -162,8 +167,6 @@ const Auth = () => {
             {isSignUp ? "Login" : "Sign up"}
           </button>
         </p>
-
-        {/* <button onClick={() => logout()}>Logout</button> */}
       </div>
     </div>
   );
