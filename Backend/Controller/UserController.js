@@ -29,3 +29,20 @@ module.exports.getTasks = async (req, res) => {
   const tasks = await Task.find({ userId });
   res.json({ tasks });
 };
+
+//addTask
+const addTask = async (req, res) => {
+  try {
+    const { userId, title, description, status } = req.body;
+    const newTask = new Task({
+      userId,
+      title,
+      description,
+      status,
+    });
+    await newTask.save();
+    res.status(201).json({ task: newTask });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to add task" });
+  }
+};
