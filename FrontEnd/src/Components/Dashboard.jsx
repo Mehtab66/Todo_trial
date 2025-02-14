@@ -1,32 +1,43 @@
 import { useEffect, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
+// import UpdateTask from "./UpdateTask";
 
 const Dashboard = () => {
   const { user, isAuthenticated, logout } = useAuth0();
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState("");
+  const [newDescription, setNewDescription] = useState("");
+  const [newStatus, setNewStatus] = useState("Pending");
+  const [selectedTask, setSelectedTask] = useState(null);
 
   // Fetch user tasks from backend
   useEffect(() => {
     if (isAuthenticated) {
       fetch(`http://localhost:3000/todo/tasks?userId=${user.sub}`)
         .then((res) => res.json())
-        .then((data) => setTasks(data.tasks || ""))
+        .then((data) => setTasks(data.tasks || []))
         .catch((error) => console.error("Error fetching tasks:", error));
     }
   }, [isAuthenticated, user?.sub]);
 
   // Add new task
   const addTask = async () => {
-    if (!newTask.trim()) return;
+    if (!newTask.trim() || !newDescription.trim()) return;
     const response = await fetch("http://localhost:3000/todo/tasks", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId: user.sub, title: newTask }),
+      body: JSON.stringify({
+        userId: user.sub,
+        title: newTask,
+        description: newDescription,
+        status: newStatus,
+      }),
     });
     const data = await response.json();
     setTasks([...tasks, data.task]);
     setNewTask("");
+    setNewDescription("");
+    setNewStatus("Pending");
   };
 
   // Delete a task
@@ -40,7 +51,7 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen flex flex-col items-center bg-gray-100 p-6">
       {/* User Info Section */}
-      <div className="w-full  bg-white shadow-lg rounded-xl p-6 text-center">
+      <div className="w-full bg-white shadow-lg rounded-xl p-6 text-center">
         <h1 className="text-2xl font-bold text-gray-800">
           Welcome, {user?.name} 👋
         </h1>
@@ -53,28 +64,47 @@ const Dashboard = () => {
         </button>
       </div>
 
-      {/* Task Management Section */}
-      <div className="w-full  bg-white shadow-lg rounded-xl mt-6 p-6">
-        <h2 className="text-xl font-semibold text-gray-800">Your Tasks</h2>
+      {/* Add Task Section */}
+      <div className="w-full bg-white shadow-lg rounded-xl mt-6 p-6">
+        <h2 className="text-xl font-semibold text-gray-800">Add Task</h2>
 
         {/* Task Input */}
-        <div className="flex mt-4">
+        <div className="flex flex-col gap-2 mt-4">
           <input
             type="text"
-            placeholder="New Task..."
+            placeholder="Task Title..."
             value={newTask}
             onChange={(e) => setNewTask(e.target.value)}
-            className="w-full p-2 border rounded-l-md focus:outline-none"
+            className="w-full p-2 border rounded-md focus:outline-none"
           />
+          <textarea
+            placeholder="Task Description..."
+            value={newDescription}
+            onChange={(e) => setNewDescription(e.target.value)}
+            className="w-full p-2 border rounded-md focus:outline-none"
+          />
+          <select
+            value={newStatus}
+            onChange={(e) => setNewStatus(e.target.value)}
+            className="w-full p-2 border rounded-md"
+          >
+            <option value="Pending">Pending</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Completed">Completed</option>
+          </select>
           <button
             onClick={addTask}
-            className="bg-blue-500 text-white px-4 rounded-r-md hover:bg-blue-600 transition"
+            className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition"
           >
-            Add
+            Add Task
           </button>
         </div>
+      </div>
 
-        {/* Task List */}
+      {/* Task List */}
+      <div className="w-full bg-white shadow-lg rounded-xl mt-6 p-6">
+        <h2 className="text-xl font-semibold text-gray-800">Your Tasks</h2>
+
         <ul className="mt-4">
           {tasks.length === 0 ? (
             <p className="text-gray-500 text-center">No tasks yet!</p>
@@ -82,11 +112,29 @@ const Dashboard = () => {
             tasks.map((task) => (
               <li
                 key={task._id}
-                className="flex justify-between items-center bg-gray-50 p-2 rounded-md mt-2 shadow"
+                className="flex justify-between items-center bg-gray-50 p-2 rounded-md mt-2 shadow cursor-pointer"
+                onClick={() => setSelectedTask(task)}
               >
-                <span className="text-gray-700">{task.title}</span>
+                <div>
+                  <p className="text-gray-700 font-semibold">{task.title}</p>
+                  <p className="text-gray-600 text-sm">{task.description}</p>
+                  <span
+                    className={`text-xs p-1 rounded-md ${
+                      task.status === "Completed"
+                        ? "bg-green-200"
+                        : task.status === "In Progress"
+                        ? "bg-yellow-200"
+                        : "bg-red-200"
+                    }`}
+                  >
+                    {task.status}
+                  </span>
+                </div>
                 <button
-                  onClick={() => deleteTask(task._id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteTask(task._id);
+                  }}
                   className="text-red-500 hover:text-red-700"
                 >
                   ❌
@@ -96,6 +144,15 @@ const Dashboard = () => {
           )}
         </ul>
       </div>
+
+      {/* Update Task Modal */}
+      {selectedTask && (
+        <UpdateTask
+          task={selectedTask}
+          onClose={() => setSelectedTask(null)}
+          setTasks={setTasks}
+        />
+      )}
     </div>
   );
 };
