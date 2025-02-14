@@ -2,7 +2,7 @@ const User = require("../Models/User");
 const Task = require("../Models/Task");
 module.exports.checkUser = async (req, res) => {
   const { auth0Id, email, name } = req.body;
-
+  console.log(auth0Id, email, name);
   try {
     let user = await User.findOne({ auth0Id });
 
@@ -18,6 +18,7 @@ module.exports.checkUser = async (req, res) => {
 
     res.status(201).json({ message: "User created successfully", user });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };

@@ -17,19 +17,53 @@ const Auth = () => {
     getAccessTokenSilently,
   } = useAuth0();
   const navigate = useNavigate();
+  const checkUserInDB = async () => {
+    if (isAuthenticated && user) {
+      try {
+        const token = await getAccessTokenSilently();
+        const response = await fetch("http://localhost:3000/todo/users", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            auth0Id: user.sub,
+            name: user.name,
+            email: user.email,
+          }),
+        });
 
+        const data = await response.json();
+
+        if (data.newUser) {
+          console.log("New user created:", data.user);
+        } else {
+          console.log("User already exists:", data.user);
+        }
+
+        navigate("/dashboard"); // Redirect after login
+      } catch (error) {
+        console.error("Error checking user in DB:", error);
+      }
+    }
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (isSignUp) {
       // Handle sign-up logic here
       try {
-        const response = await fetch("http://localhost:3000/auth/signup", {
+        const response = await fetch("http://localhost:3000/todo/signup", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ email, password, name }),
+          body: JSON.stringify({
+            email: userData.email,
+            password: userData.password,
+            name: userData.name,
+          }),
         });
 
         if (!response.ok) {
@@ -61,16 +95,18 @@ const Auth = () => {
           }),
         });
 
-          if (response.ok) {
-            navigate("/dashboard");
-          }
-        } catch (error) {
-          console.error("Error checking user in DB:", error);
+        if (response.ok) {
+          navigate("/dashboard");
         }
+      } catch (error) {
+        console.error("Error checking user in DB:", error);
       }
-    };
+    }
+  };
+
+  useEffect(() => {
     checkUserInDB();
-  }, [isAuthenticated, user, getAccessTokenSilently, navigate]);
+  }, [isAuthenticated, user, getAccessTokenSilently]);
 
   // Handle Manual Signup/Login
   const handleAuth = async (e) => {
