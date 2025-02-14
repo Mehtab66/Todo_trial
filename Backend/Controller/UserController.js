@@ -24,25 +24,31 @@ module.exports.checkUser = async (req, res) => {
 
 //get all tasks
 module.exports.getTasks = async (req, res) => {
-  const { userId } = req.query;
-  console.log(userId, "user id man");
-  const tasks = await Task.find({ userId });
-  res.json({ tasks });
+  try {
+    const { userId } = req.query;
+    // Fetch tasks and sort them by createdAt in descending order (newest first)
+    const tasks = await Task.find({ userId }).sort({ createdAt: -1 });
+    res.json({ tasks });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch tasks" });
+  }
 };
 
 //addTask
-const addTask = async (req, res) => {
+module.exports.addTask = async (req, res) => {
   try {
-    const { userId, title, description, status } = req.body;
+    const { userId, name, description, status } = req.body;
+    console.log(userId, name, description, status);
     const newTask = new Task({
       userId,
-      title,
+      name,
       description,
       status,
     });
     await newTask.save();
     res.status(201).json({ task: newTask });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: "Failed to add task" });
   }
 };

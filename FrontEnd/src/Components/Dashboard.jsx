@@ -5,7 +5,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 const Dashboard = () => {
   const { user, isAuthenticated, logout } = useAuth0();
   const [tasks, setTasks] = useState([]);
-  const [newTask, setNewTask] = useState("");
+  const [name, setName] = useState("");
   const [newDescription, setNewDescription] = useState("");
   const [newStatus, setNewStatus] = useState("Pending");
   const [selectedTask, setSelectedTask] = useState(null);
@@ -22,20 +22,20 @@ const Dashboard = () => {
 
   // Add new task
   const addTask = async () => {
-    if (!newTask.trim() || !newDescription.trim()) return;
-    const response = await fetch("http://localhost:3000/todo/tasks", {
+    if (!name.trim() || !newDescription.trim()) return;
+    const response = await fetch("http://localhost:3000/todo/task", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         userId: user.sub,
-        title: newTask,
+        name: name,
         description: newDescription,
         status: newStatus,
       }),
     });
     const data = await response.json();
     setTasks([...tasks, data.task]);
-    setNewTask("");
+    setName("");
     setNewDescription("");
     setNewStatus("Pending");
   };
@@ -73,8 +73,8 @@ const Dashboard = () => {
           <input
             type="text"
             placeholder="Task Title..."
-            value={newTask}
-            onChange={(e) => setNewTask(e.target.value)}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             className="w-full p-2 border rounded-md focus:outline-none"
           />
           <textarea
@@ -116,7 +116,7 @@ const Dashboard = () => {
                 onClick={() => setSelectedTask(task)}
               >
                 <div>
-                  <p className="text-gray-700 font-semibold">{task.title}</p>
+                  <p className="text-gray-700 font-semibold">{task.name}</p>
                   <p className="text-gray-600 text-sm">{task.description}</p>
                   <span
                     className={`text-xs p-1 rounded-md ${
@@ -130,15 +130,17 @@ const Dashboard = () => {
                     {task.status}
                   </span>
                 </div>
+                <button className="bg-green-600 px-6 py-3 rounded-2xl text-white ">Edit</button>
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
                     deleteTask(task._id);
                   }}
-                  className="text-red-500 hover:text-red-700"
+                  className="text-white px-6 py-3 rounded-2xl bg-red-600"
                 >
-                  ❌
+                  Delete Task
                 </button>
+                
               </li>
             ))
           )}
