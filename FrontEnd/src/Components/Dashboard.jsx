@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
-// import UpdateTask from "./UpdateTask";
+import UpdateTask from "./UpdateTask";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
   const { user, isAuthenticated, logout } = useAuth0();
@@ -9,7 +10,7 @@ const Dashboard = () => {
   const [newDescription, setNewDescription] = useState("");
   const [newStatus, setNewStatus] = useState("Pending");
   const [selectedTask, setSelectedTask] = useState(null);
-
+  const navigate = useNavigate();
   // Fetch user tasks from backend
   useEffect(() => {
     if (isAuthenticated) {
@@ -42,7 +43,7 @@ const Dashboard = () => {
 
   // Delete a task
   const deleteTask = async (taskId) => {
-    await fetch(`http://localhost:3000/todo/tasks/${taskId}`, {
+    await fetch(`http://localhost:3000/todo/task/${taskId}`, {
       method: "DELETE",
     });
     setTasks(tasks.filter((task) => task._id !== taskId));
@@ -130,7 +131,16 @@ const Dashboard = () => {
                     {task.status}
                   </span>
                 </div>
-                <button className="bg-green-600 px-6 py-3 rounded-2xl text-white ">Edit</button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`/updatetask/${task._id}`);
+                  }}
+                  className="bg-green-600 px-6 py-3 rounded-2xl text-white "
+                >
+                  Edit
+                </button>
+
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
@@ -140,7 +150,6 @@ const Dashboard = () => {
                 >
                   Delete Task
                 </button>
-                
               </li>
             ))
           )}
