@@ -15,6 +15,6 @@ router.get("/task/:id", Controller.getTaskById);
 // Update task
 router.patch("/task/:id", Controller.updateTask);
 
-module.exports = router;
-
+router.post("/register", Controller.registerUser);
+router.post("/login", Controller.loginUser);
 module.exports = router;

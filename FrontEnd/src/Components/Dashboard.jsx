@@ -11,15 +11,30 @@ const Dashboard = () => {
   const [newStatus, setNewStatus] = useState("Pending");
   const [selectedTask, setSelectedTask] = useState(null);
   const navigate = useNavigate();
+  const [userName, setUserName] = useState("");
   // Fetch user tasks from backend
+  // useEffect(() => {
+  //   if (isAuthenticated) {
+  //     fetch(`http://localhost:3000/todo/tasks?userId=${user.sub}`)
+  //       .then((res) => res.json())
+  //       .then((data) => setTasks(data.tasks || []))
+  //       .catch((error) => console.error("Error fetching tasks:", error));
+  //   }
+  // }, [isAuthenticated, user?.sub]);
+
   useEffect(() => {
     if (isAuthenticated) {
-      fetch(`http://localhost:3000/todo/tasks?userId=${user.sub}`)
+      fetch(
+        `http://localhost:3000/todo/tasks?userId=${user.sub}&email=${user.email}`
+      )
         .then((res) => res.json())
-        .then((data) => setTasks(data.tasks || []))
+        .then((data) => {
+          setTasks(data.tasks || []);
+          if (data.user) setUserName(data.user.name); // Use backend user name
+        })
         .catch((error) => console.error("Error fetching tasks:", error));
     }
-  }, [isAuthenticated, user?.sub]);
+  }, [isAuthenticated, user?.sub, user?.email]);
 
   // Add new task
   const addTask = async () => {
