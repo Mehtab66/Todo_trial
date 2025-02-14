@@ -1,0 +1,53 @@
+[33mcommit 0f640af089ad23a59b7aaf88118c33624f76997c[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m
+Author: Muhammad Mehtab AHmed <mehtabahmed7777777@gmail.com>
+Date:   Fri Feb 14 15:02:02 2025 +0500
+
+    Save my local changes before revert
+
+[33mcommit 912e1433fe5c892a40bd5ff4e4904cd1d0656d9b[m
+Author: Muhammad Mehtab AHmed <mehtabahmed7777777@gmail.com>
+Date:   Fri Feb 14 15:00:08 2025 +0500
+
+    Reverting Back
+
+[33mcommit 4efa0658c26571717f10fdeb165e44d03f667d05[m
+Author: Muhammad Mehtab AHmed <mehtabahmed7777777@gmail.com>
+Date:   Fri Feb 14 14:59:12 2025 +0500
+
+    Save my local changes before revert
+
+[33mcommit e73d4f97bd8b4d126ca478a581f21075eb771062[m
+Author: Muhammad Mehtab AHmed <mehtabahmed7777777@gmail.com>
+Date:   Fri Feb 14 14:17:02 2025 +0500
+
+    Controller set Up for Logging using Email and Password
+
+[33mcommit dddad50d01a520afd64069f80aa6ca28bc0b7c3f[m
+Author: Muhammad Mehtab AHmed <mehtabahmed7777777@gmail.com>
+Date:   Fri Feb 14 12:37:46 2025 +0500
+
+    Update Page and Controller for Update is done
+
+[33mcommit 6b3039a1d87d26d72808d8e7fcee450258ee5b98[m
+Author: Muhammad Mehtab AHmed <mehtabahmed7777777@gmail.com>
+Date:   Fri Feb 14 12:09:10 2025 +0500
+
+    Edit and Deleted Button change for dashboard
+
+[33mcommit ad50509e35cea1ec8cfd12d9b1eb8bb1298a3963[m
+Author: Muhammad Mehtab AHmed <mehtabahmed7777777@gmail.com>
+Date:   Fri Feb 14 08:31:48 2025 +0500
+
+    Add Task Controller added
+
+[33mcommit e74de857d418f1721d2046079cca3b991e29c91f[m
+Author: Muhammad Mehtab AHmed <mehtabahmed7777777@gmail.com>
+Date:   Fri Feb 14 08:30:47 2025 +0500
+
+    Routes for adding uodating and deleting tasks added
+
+[33mcommit 47651d10b1227a57659bbd5cdeb03e9d665d4d54[m
+Author: Muhammad Mehtab AHmed <mehtabahmed7777777@gmail.com>
+Date:   Fri Feb 14 08:18:13 2025 +0500
+
+    Google Auth Added
